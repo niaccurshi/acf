@@ -15,7 +15,7 @@
 *  @return	$return (mixed)
 */
 
-function acf_get_metadata( $post_id = 0, $name = '', $hidden = false ) {
+function acf_get_metadata( $post_id = 0, $name = '', $hidden = false, $blog_id = NULL ) {
 	
 	// vars
 	$value = null;
@@ -34,13 +34,17 @@ function acf_get_metadata( $post_id = 0, $name = '', $hidden = false ) {
 	if( $info['type'] === 'option' ) {
 		
 		$name = $prefix . $post_id . '_' . $name;
-		$value = get_option( $name, null );
+		$value = get_blog_option($blog_id, $name, null );
 		
 	// meta
 	} else {
-		
+		if ($blog_id !== NULL && is_int($blog_id)) {
+			switch_to_blog($blog_id);
+		}
 		$name = $prefix . $name;
 		$meta = get_metadata( $info['type'], $info['id'], $name, false );
+		
+		restore_current_blog();
 		
 		if( isset($meta[0]) ) {
 		
@@ -228,7 +232,7 @@ function acf_update_option( $option = '', $value = '', $autoload = null ) {
 *  @return	(mixed)
 */
 
-function acf_get_value( $post_id = 0, $field ) {
+function acf_get_value( $post_id = 0, $field, $blog_id = NULL ) {
 	
 	// vars
 	$cache_key = "get_value/post_id={$post_id}/name={$field['name']}";
@@ -243,7 +247,7 @@ function acf_get_value( $post_id = 0, $field ) {
 	
 	
 	// load value
-	$value = acf_get_metadata( $post_id, $field['name'] );
+	$value = acf_get_metadata( $post_id, $field['name'], $blog_id );
 	
 	
 	// if value was duplicated, it may now be a serialized string!
@@ -257,7 +261,9 @@ function acf_get_value( $post_id = 0, $field ) {
 		
 	}
 	
-	
+	if ($blog_id !== NULL && is_int($blog_id)) {
+		switch_to_blog($blog_id);
+	}
 	// filter for 3rd party customization
 	$value = apply_filters( "acf/load_value", $value, $post_id, $field );
 	$value = apply_filters( "acf/load_value/type={$field['type']}", $value, $post_id, $field );
@@ -267,7 +273,7 @@ function acf_get_value( $post_id = 0, $field ) {
 	
 	// update cache
 	acf_set_cache($cache_key, $value);
-
+	restore_current_blog();
 	
 	// return
 	return $value;
@@ -290,11 +296,14 @@ function acf_get_value( $post_id = 0, $field ) {
 *  @return	$value
 */
 
-function acf_format_value( $value, $post_id, $field ) {
+function acf_format_value( $value, $post_id, $field, $blog_id = NULL ) {
 	
 	// vars
 	$cache_key = "format_value/post_id={$post_id}/name={$field['name']}";
 	
+	if ($blog_id !== NULL && is_int($blog_id)) {
+		switch_to_blog($blog_id);
+	}
 	
 	// return early if cache is found
 	if( acf_isset_cache($cache_key) ) {
@@ -313,7 +322,7 @@ function acf_format_value( $value, $post_id, $field ) {
 	
 	// update cache
 	acf_set_cache($cache_key, $value);
-	
+	restore_current_blog();
 	
 	// return
 	return $value;
