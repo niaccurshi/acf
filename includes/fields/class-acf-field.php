@@ -42,7 +42,7 @@ class acf_field {
 		
 		
 		// value
-		$this->add_field_filter('acf/load_value',					array($this, 'load_value'), 10, 3);
+		$this->add_field_filter('acf/load_value',					array($this, 'load_value'), 10, 4);
 		$this->add_field_filter('acf/update_value',					array($this, 'update_value'), 10, 3);
 		$this->add_field_filter('acf/format_value',					array($this, 'format_value'), 10, 3);
 		$this->add_field_filter('acf/validate_value',				array($this, 'validate_value'), 10, 4);
