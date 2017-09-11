@@ -15,10 +15,10 @@
 *  @return	$reference (string)	a string containing the field_key
 */
 
-function acf_get_field_reference( $field_name, $post_id ) {
+function acf_get_field_reference( $field_name, $post_id, $blog_id = NULL ) {
 	
 	// vars
-	$field_key = acf_get_metadata( $post_id, $field_name, true );
+	$field_key = acf_get_metadata( $post_id, $field_name,  true, $blog_id );
 	
 	
 	// filter
@@ -48,14 +48,14 @@ function acf_get_field_reference( $field_name, $post_id ) {
 *  @return	(mixed)
 */
  
-function get_field( $selector, $post_id = false, $format_value = true ) {
+function get_field( $selector, $post_id = false, $format_value = true, $blog_id = NULL ) {
 	
 	// filter post_id
 	$post_id = acf_get_valid_post_id( $post_id );
 	
 	
 	// get field
-	$field = acf_maybe_get_field( $selector, $post_id );
+	$field = acf_maybe_get_field( $selector, $post_id, true, $blog_id );
 	
 	
 	// create dummy field
@@ -75,14 +75,14 @@ function get_field( $selector, $post_id = false, $format_value = true ) {
 	
 	
 	// get value for field
-	$value = acf_get_value( $post_id, $field );
+	$value = acf_get_value( $post_id, $field, $blog_id );
 	
 	
 	// format value
 	if( $format_value ) {
 		
 		// get value for field
-		$value = acf_format_value( $value, $post_id, $field );
+		$value = acf_format_value( $value, $post_id, $field, $blog_id );
 		
 	}
 	
@@ -107,9 +107,9 @@ function get_field( $selector, $post_id = false, $format_value = true ) {
 *  @return	n/a
 */
 
-function the_field( $selector, $post_id = false, $format_value = true ) {
+function the_field( $selector, $post_id = false, $format_value = true, $blog_id = NULL ) {
 	
-	$value = get_field($selector, $post_id, $format_value);
+	$value = get_field($selector, $post_id, $format_value, $blog_id);
 	
 	if( is_array($value) ) {
 		
@@ -138,7 +138,7 @@ function the_field( $selector, $post_id = false, $format_value = true ) {
 *  @return	$field (array)
 */
 
-function get_field_object( $selector, $post_id = false, $format_value = true, $load_value = true ) {
+function get_field_object( $selector, $post_id = false, $format_value = true, $load_value = true, $blog_id = NULL ) {
 	
 	// compatibilty
 	if( is_array($format_value) ) extract( $format_value );
@@ -149,7 +149,7 @@ function get_field_object( $selector, $post_id = false, $format_value = true, $l
 	
 	
 	// get field key
-	$field = acf_maybe_get_field( $selector, $post_id );
+	$field = acf_maybe_get_field( $selector, $post_id, true, $blog_id );
 	
 	
 	// bail early if no field found
@@ -159,7 +159,7 @@ function get_field_object( $selector, $post_id = false, $format_value = true, $l
 	// load value
 	if( $load_value ) {
 	
-		$field['value'] = acf_get_value( $post_id, $field );
+		$field['value'] = acf_get_value( $post_id, $field, $blog_id );
 		
 	}
 	
@@ -168,7 +168,7 @@ function get_field_object( $selector, $post_id = false, $format_value = true, $l
 	if( $format_value ) {
 		
 		// get value for field
-		$field['value'] = acf_format_value( $field['value'], $post_id, $field );
+		$field['value'] = acf_format_value( $field['value'], $post_id, $field, $blog_id );
 		
 	}
 	
@@ -194,10 +194,10 @@ function get_field_object( $selector, $post_id = false, $format_value = true, $l
 *  @return	(array)	associative array where field name => field value
 */
 
-function get_fields( $post_id = false, $format_value = true ) {
+function get_fields( $post_id = false, $format_value = true, $blog_id = NULL ) {
 	
 	// vars
-	$fields = get_field_objects( $post_id, $format_value );
+	$fields = get_field_objects( $post_id, $format_value, true, $blog_id );
 	$meta = array();
 	
 	
@@ -235,7 +235,7 @@ function get_fields( $post_id = false, $format_value = true ) {
 *  @return	(array)	associative array where field name => field
 */
 
-function get_field_objects( $post_id = false, $format_value = true, $load_value = true ) {
+function get_field_objects( $post_id = false, $format_value = true, $load_value = true, $blog_id = NULL ) {
 	
 	// global
 	global $wpdb;
@@ -323,7 +323,7 @@ function get_field_objects( $post_id = false, $format_value = true, $load_value 
 		
 		// get field
 		$field_key = $meta["_{$k}"][0];
-		$field = acf_maybe_get_field( $field_key );
+		$field = acf_maybe_get_field( $field_key, false, true, $blog_id );
 		
 		
 		// bail early if no field, or if the field's name is different to $k
@@ -334,7 +334,7 @@ function get_field_objects( $post_id = false, $format_value = true, $load_value 
 		// load value
 		if( $load_value ) {
 		
-			$field['value'] = acf_get_value( $post_id, $field );
+			$field['value'] = acf_get_value( $post_id, $field, $blog_id );
 			
 		}
 		
@@ -343,7 +343,7 @@ function get_field_objects( $post_id = false, $format_value = true, $load_value 
 		if( $format_value ) {
 			
 			// get value for field
-			$field['value'] = acf_format_value( $field['value'], $post_id, $field );
+			$field['value'] = acf_format_value( $field['value'], $post_id, $field, $blog_id );
 			
 		}
 		
@@ -378,7 +378,7 @@ function get_field_objects( $post_id = false, $format_value = true, $load_value 
 *  @return	(boolean)
 */
 
-function have_rows( $selector, $post_id = false ) {
+function have_rows( $selector, $post_id = false, $blog_id = NULL ) {
 	
 	// reference
 	$_post_id = $post_id;
@@ -501,7 +501,7 @@ function have_rows( $selector, $post_id = false ) {
 		// parent loop
 		if( $new_parent_loop ) {
 			
-			$field = get_field_object( $selector, $post_id, false );
+			$field = get_field_object( $selector, $post_id, false, true, $blog_id );
 			$value = acf_extract_var( $field, 'value' );
 			$name = $field['name'];
 			
@@ -819,10 +819,10 @@ function has_sub_fields( $field_name, $post_id = false ) {
 *  @return	(mixed)
 */
 
-function get_sub_field( $selector = '', $format_value = true ) {
+function get_sub_field( $selector = '', $format_value = true, $blog_id = NULL ) {
 	
 	// get sub field
-	$sub_field = get_sub_field_object( $selector, $format_value );
+	$sub_field = get_sub_field_object( $selector, $format_value, true, $blog_id );
 	
 	
 	// bail early if no sub field
@@ -848,9 +848,9 @@ function get_sub_field( $selector = '', $format_value = true ) {
 *  @return	n/a
 */
 
-function the_sub_field( $field_name, $format_value = true ) {
+function the_sub_field( $field_name, $format_value = true, $blog_id = NULL ) {
 	
-	$value = get_sub_field( $field_name, $format_value );
+	$value = get_sub_field( $field_name, $format_value, $blog_id );
 	
 	if( is_array($value) ) {
 		
@@ -875,7 +875,7 @@ function the_sub_field( $field_name, $format_value = true ) {
 *  @return	(array)	
 */
 
-function get_sub_field_object( $selector, $format_value = true, $load_value = true ) {
+function get_sub_field_object( $selector, $format_value = true, $load_value = true, $blog_id = NULL ) {
 	
 	// vars
 	$row = acf_get_loop('active');
@@ -905,7 +905,7 @@ function get_sub_field_object( $selector, $format_value = true, $load_value = tr
 	if( $format_value ) {
 		
 		// get value for field
-		$sub_field['value'] = acf_format_value( $sub_field['value'], $row['post_id'], $sub_field );
+		$sub_field['value'] = acf_format_value( $sub_field['value'], $row['post_id'], $sub_field, $blog_id );
 		
 	}
 	
