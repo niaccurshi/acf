@@ -1020,16 +1020,19 @@ function _acf_get_field_by_name( $name = '', $db_only = false ) {
 *  @return	$field (array)
 */
 
-function acf_maybe_get_field( $selector, $post_id = false, $strict = true ) {
+function acf_maybe_get_field( $selector, $post_id = false, $strict = true, $blog_id = NULL ) {
 	
 	// init
 	acf_init();
 	
+	if ($blog_id !== NULL && is_int($blog_id)) {
+		switch_to_blog($blog_id);
+	}
 	
 	// bail early if is field key
 	if( acf_is_field_key($selector) ) {
 		
-		return acf_get_field( $selector );
+		return acf_get_field( $selector, false, $blog_id );
 		
 	}
 	
@@ -1043,7 +1046,7 @@ function acf_maybe_get_field( $selector, $post_id = false, $strict = true ) {
 	
 	
 	// get reference
-	$field_key = acf_get_field_reference( $selector, $post_id );
+	$field_key = acf_get_field_reference( $selector, $post_id, $blog_id );
 	
 	
 	// update selector
@@ -1060,13 +1063,13 @@ function acf_maybe_get_field( $selector, $post_id = false, $strict = true ) {
 	
 	
 	// get field
-	$field = acf_get_field( $selector );
+	$field = acf_get_field( $selector, false, $blog_id );
 	
 	
 	// update name
 	if( $field ) $field['name'] = $field_name;
 	
-	
+	restore_current_blog();
 	// return
 	return $field;
 	
@@ -1894,7 +1897,7 @@ function acf_get_field_ancestors( $field ) {
 *  @return	$post_id (int)
 */
 
-function acf_maybe_get_sub_field( $selectors, $post_id = false, $strict = true ) {
+function acf_maybe_get_sub_field( $selectors, $post_id = false, $strict = true, $blog_id = NULL ) {
 	
 	// bail ealry if not enough selectors
 	if( !is_array($selectors) || count($selectors) < 3 ) return false;
@@ -1907,7 +1910,7 @@ function acf_maybe_get_sub_field( $selectors, $post_id = false, $strict = true )
 	
 	
 	// attempt get field
-	$field = acf_maybe_get_field( $selector, $post_id, $strict );
+	$field = acf_maybe_get_field( $selector, $post_id, $strict, $blog_id );
 	
 	
 	// bail early if no field
