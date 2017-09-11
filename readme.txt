@@ -1,5 +1,5 @@
 === Advanced Custom Fields ===
-Contributors: elliotcondon
+Contributors: elliotcondon, niaccurshi
 Tags: acf, advanced, custom, field, fields, custom field, custom fields, simple fields, magic fields, more fields, repeater, edit
 Requires at least: 3.6.0
 Tested up to: 4.8.0
@@ -105,6 +105,10 @@ http://support.advancedcustomfields.com/
 
 
 == Changelog ==
+
+= 5.6.1.1 =
+* Added ability to ask for a field's value to be returned from a specific multisite
+* - Requires extra work for specific field types (i.e. repeater fields)
 
 = 5.6.1 =
 * Fixed an assortment of bugs found in 5.6.0
